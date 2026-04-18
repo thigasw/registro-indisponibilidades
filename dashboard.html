@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Coelho Tecnologia</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="shortcut icon" href="favco.png" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+
+  <header>
+    <div class="header-inner">
+      <div class="header-brand">
+        <img src="assets/LOGO.png" alt="Coelho Tecnologia" class="logo">
+        <div class="header-text">
+          <span class="header-label">NOC — Monitoramento</span>
+          <h1>Dashboard de Indisponibilidade</h1>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a href="index.html" class="btn btn-secondary">← Registros</a>
+        <button class="btn btn-primary" onclick="gerarRelatorio()">
+          <span class="btn-icon">📄</span> Gerar Relatório
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <section class="filter-section">
+    <div class="filter-inner">
+      <div class="filter-group">
+        <label class="filter-label">Período</label>
+        <select id="filtroPeriodo" class="filter-select" onchange="atualizarDashboard()">
+          <option value="todos">Todos os registros</option>
+          <option value="7">Últimos 7 dias</option>
+          <option value="30" selected>Últimos 30 dias</option>
+          <option value="90">Últimos 90 dias</option>
+          <option value="365">Último ano</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Circuito</label>
+        <select id="filtroCircuitoDash" class="filter-select" onchange="atualizarDashboard()">
+          <option value="">Todos</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Status</label>
+        <select id="filtroStatusDash" class="filter-select" onchange="atualizarDashboard()">
+          <option value="">Todos</option>
+          <option value="Em Aberto">Em Aberto</option>
+          <option value="Concluído">Concluído</option>
+        </select>
+      </div>
+      <div id="periodoLabel" class="periodo-label"></div>
+    </div>
+  </section>
+
+  <main class="dash-main">
+
+    <section class="kpi-grid">
+      <div class="kpi-card" id="kpi-total">
+        <div class="kpi-icon">📋</div>
+        <div class="kpi-body">
+          <span class="kpi-label">Total de Eventos</span>
+          <span class="kpi-value" id="kpiTotal">—</span>
+        </div>
+      </div>
+      <div class="kpi-card kpi-warn" id="kpi-abertos">
+        <div class="kpi-icon">⏳</div>
+        <div class="kpi-body">
+          <span class="kpi-label">Em Aberto</span>
+          <span class="kpi-value" id="kpiAbertos">—</span>
+        </div>
+      </div>
+      <div class="kpi-card kpi-ok" id="kpi-concluidos">
+        <div class="kpi-icon">✔</div>
+        <div class="kpi-body">
+          <span class="kpi-label">Concluídos</span>
+          <span class="kpi-value" id="kpiConcluidos">—</span>
+        </div>
+      </div>
+      <div class="kpi-card kpi-info" id="kpi-tempo">
+        <div class="kpi-icon">⏱</div>
+        <div class="kpi-body">
+          <span class="kpi-label">Tempo Total Acumulado</span>
+          <span class="kpi-value" id="kpiTempo">—</span>
+        </div>
+      </div>
+      <div class="kpi-card kpi-danger" id="kpi-pior">
+        <div class="kpi-icon">🔴</div>
+        <div class="kpi-body">
+          <span class="kpi-label">Circuito Mais Afetado</span>
+          <span class="kpi-value kpi-value--sm" id="kpiPior">—</span>
+        </div>
+      </div>
+      <div class="kpi-card kpi-neutral" id="kpi-media">
+        <div class="kpi-icon">📊</div>
+        <div class="kpi-body">
+          <span class="kpi-label">Tempo Médio por Evento</span>
+          <span class="kpi-value" id="kpiMedia">—</span>
+        </div>
+      </div>
+    </section>
+    <section class="charts-row">
+
+      <div class="chart-card chart-card--lg">
+        <div class="chart-header">
+          <div>
+            <h2 class="chart-title">Indisponibilidade por Circuito</h2>
+            <p class="chart-sub">Tempo total acumulado (horas)</p>
+          </div>
+          <div class="chart-legend-toggle">
+            <button class="toggle-btn active" id="btnBarTempo" onclick="alternarBarMode('tempo')">Tempo</button>
+            <button class="toggle-btn" id="btnBarQtd"   onclick="alternarBarMode('qtd')">Qtd. Eventos</button>
+          </div>
+        </div>
+        <div class="chart-body">
+          <canvas id="chartBarCircuito"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card chart-card--sm">
+        <div class="chart-header">
+          <div>
+            <h2 class="chart-title">Distribuição por Status</h2>
+            <p class="chart-sub">Proporção de eventos</p>
+          </div>
+        </div>
+        <div class="chart-body chart-body--donut">
+          <canvas id="chartDonutStatus"></canvas>
+        </div>
+      </div>
+
+    </section>
+    <section class="charts-row">
+
+      <div class="chart-card chart-card--full">
+        <div class="chart-header">
+          <div>
+            <h2 class="chart-title">Linha do Tempo de Eventos</h2>
+            <p class="chart-sub">Quantidade de ocorrências por dia</p>
+          </div>
+        </div>
+        <div class="chart-body">
+          <canvas id="chartLinha"></canvas>
+        </div>
+      </div>
+
+    </section>
+    <section class="charts-row">
+
+      <div class="chart-card chart-card--md">
+        <div class="chart-header">
+          <div>
+            <h2 class="chart-title">Eventos por Dia da Semana</h2>
+            <p class="chart-sub">Padrão semanal de falhas</p>
+          </div>
+        </div>
+        <div class="chart-body">
+          <canvas id="chartSemana"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card chart-card--md">
+        <div class="chart-header">
+          <div>
+            <h2 class="chart-title">Eventos por Hora do Dia</h2>
+            <p class="chart-sub">Distribuição horária das quedas</p>
+          </div>
+        </div>
+        <div class="chart-body">
+          <canvas id="chartHora"></canvas>
+        </div>
+      </div>
+
+    </section>
+    <section class="chart-card" style="margin-bottom: 32px;">
+      <div class="chart-header">
+        <div>
+          <h2 class="chart-title">Ranking de Circuitos</h2>
+          <p class="chart-sub">Ordenado por tempo total de indisponibilidade</p>
+        </div>
+      </div>
+      <div class="ranking-wrapper">
+        <table class="ranking-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Circuito</th>
+              <th>Eventos</th>
+              <th>Tempo Total</th>
+              <th>Tempo Médio</th>
+              <th>Em Aberto</th>
+              <th>Barra</th>
+            </tr>
+          </thead>
+          <tbody id="rankingBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+  <div id="modalRelatorio" class="modal-overlay">
+    <div class="modal-box modal-box--relatorio">
+      <div class="modal-header">
+        <h3>Relatório de Indisponibilidade</h3>
+        <button class="modal-close" onclick="fecharRelatorio()">✕</button>
+      </div>
+      <div id="relatorioConteudo" class="relatorio-body"></div>
+      <div class="modal-footer relatorio-footer">
+        <button class="btn btn-secondary" onclick="fecharRelatorio()">Fechar</button>
+        <button class="btn btn-primary" onclick="imprimirRelatorio()">🖨 Imprimir / Salvar PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script/dashboard.js"></script>
+</body>
+</html>
