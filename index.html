@@ -1,78 +1,151 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro - Coelho Tecnologia</title>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro - Coelho Tecnologia</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="shortcut icon" href="favco.png" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <img src="assets/LOGO.png" alt="logo coelho" width="200">
-        <h1>Registro - Indisponibilidade dos Circuitos</h1>
-    </header>
 
-    <div class="controls">
-        <button id="addRecordBtn">➕ Adicionar Registro</button>
-        <button id="exportCsvBtn" onclick="exportarCSV()">📥 Exportar para CSV</button>
-    </div>
-
-    <div class="filter-bar">
-        <select id="filterCircuito" onchange="renderizarTabela()">
-            <option value="">Filtrar Circuito</option>
-        </select>
-        <select id="filterStatus" onchange="renderizarTabela()">
-            <option value="">Todos os Status</option>
-            <option value="Concluído">Concluído</option>
-            <option value="Em Aberto">Em Aberto</option>
-        </select>
-        <input type="date" id="filterData" onchange="renderizarTabela()">
-        <input type="text" id="filterProtocolo" placeholder="Buscar Protocolo..." onkeyup="renderizarTabela()">
-    </div>
-
-    <div class="table_container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Circuito</th>
-                    <th>Status</th>
-                    <th>Prot. Operadora</th>
-                    <th>Prot. Coelho</th>
-                    <th>Data</th>
-                    <th>Início</th>
-                    <th>Fim</th>
-                    <th>Indisponibilidade</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="registroTableBody"></tbody>
-        </table>
-    </div>
-
-    <div id="modalRegistro" class="modal">
-        <div class="modal-content">
-            <h3>Novo Registro</h3>
-            <form id="formRegistro">
-                <select id="inputCircuito" required></select>
-                <select id="inputStatus" required>
-                    <option value="Em Aberto">Em Aberto</option>
-                    <option value="Concluído">Concluído</option>
-                </select>
-                <input type="text" id="inputProtOperadora" placeholder="Protocolo Operadora">
-                <input type="text" id="inputProtCoelho" placeholder="Protocolo Coelho">
-                <input type="date" id="inputData" required>
-                <div class="time-group">
-                    <label>Início: <input type="time" id="inputInicio" required></label>
-                    <label>Fim: <input type="time" id="inputFim" required></label>
-                </div>
-                <div class="modal-buttons">
-                    <button type="submit" class="btn-salvar">Salvar</button>
-                    <button type="button" class="btn-cancelar" id="closeModal">Cancelar</button>
-                </div>
-            </form>
+  <header>
+    <div class="header-inner">
+      <div class="header-brand">
+        <img src="assets/LOGO.png" alt="Coelho Tecnologia" class="logo">
+        <div class="header-text">
+          <span class="header-label">NOC — Monitoramento</span>
+          <h1>Registro de Indisponibilidade</h1>
         </div>
+      </div>
+      <div class="header-actions">
+        <a href="dashboard.html" class="btn btn-secondary">
+          <span class="btn-icon">📊</span> Dashboard
+        </a>
+        <button id="addRecordBtn" class="btn btn-primary">
+          <span class="btn-icon">+</span> Novo Registro
+        </button>
+        <button class="btn btn-secondary" onclick="exportarCSV()">
+          <span class="btn-icon">↓</span> Exportar CSV
+        </button>
+      </div>
     </div>
+  </header>
 
-    <script src="script/script.js"></script>
+  <section class="filter-section">
+    <div class="filter-inner">
+      <div class="filter-group">
+        <label class="filter-label" for="filterCircuito">Circuito</label>
+        <select id="filterCircuito" class="filter-select" onchange="renderizarTabela()">
+          <option value="">Todos os circuitos</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label" for="filterStatus">Status</label>
+        <select id="filterStatus" class="filter-select" onchange="renderizarTabela()">
+          <option value="">Todos</option>
+          <option value="Concluído">Concluído</option>
+          <option value="Em Aberto">Em Aberto</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label" for="filterData">Data</label>
+        <input type="date" id="filterData" class="filter-input" onchange="renderizarTabela()" title="Filtrar por data de início">
+      </div>
+      <div class="filter-group filter-group--wide">
+        <label class="filter-label" for="filterProtocolo">Protocolo</label>
+        <input type="text" id="filterProtocolo" class="filter-input" placeholder="Buscar protocolo..." onkeyup="renderizarTabela()">
+      </div>
+      <button class="btn-limpar" onclick="limparFiltros()" title="Limpar filtros">✕ Limpar</button>
+    </div>
+  </section>
+
+  <main class="main-content">
+    <div class="table-wrapper">
+      <table class="registro-table">
+        <thead>
+          <tr>
+            <th>Circuito</th>
+            <th>Status</th>
+            <th>Prot. Operadora</th>
+            <th>Prot. Coelho</th>
+            <th>Início</th>
+            <th>Fim</th>
+            <th>Tempo Total</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="registroTableBody"></tbody>
+      </table>
+    </div>
+    <div class="table-footer" id="tableFooter"></div>
+  </main>
+
+  <div id="modalRegistro" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalTitulo">Novo Registro de Indisponibilidade</h3>
+        <button class="modal-close" id="closeModal" aria-label="Fechar">✕</button>
+      </div>
+
+      <form id="formRegistro" class="modal-form">
+
+        <div class="form-row">
+          <div class="form-group form-group--full">
+            <label class="form-label" for="inputCircuito">Circuito <span class="required">*</span></label>
+            <select id="inputCircuito" class="form-control" required>
+              <option value="" disabled selected>Selecione o circuito</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="inputStatus">Status <span class="required">*</span></label>
+            <select id="inputStatus" class="form-control" required>
+              <option value="Em Aberto">Em Aberto</option>
+              <option value="Concluído">Concluído</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row form-row--2col">
+          <div class="form-group">
+            <label class="form-label" for="inputProtOperadora">Protocolo Operadora</label>
+            <input type="text" id="inputProtOperadora" class="form-control" placeholder="Ex: TESADIP351465">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="inputProtCoelho">Protocolo Coelho</label>
+            <input type="text" id="inputProtCoelho" class="form-control" placeholder="Ex: CHT-20241201">
+          </div>
+        </div>
+
+        <div class="form-row form-row--2col">
+          <div class="form-group">
+            <label class="form-label" for="inputInicio">Início da Queda <span class="required">*</span></label>
+            <input type="datetime-local" id="inputInicio" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="inputFim">Previsão / Retorno <span class="required">*</span></label>
+            <input type="datetime-local" id="inputFim" class="form-control" required>
+          </div>
+        </div>
+        <div class="tempo-preview" id="tempoPreviewBox">
+          <span class="tempo-icon">⏱</span>
+          <span id="previewTempo">Preencha início e fim para calcular</span>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="closeModalBtn">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Registro</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <script src="script/script.js"></script>
 </body>
 </html>
