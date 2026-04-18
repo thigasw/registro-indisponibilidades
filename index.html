@@ -3,40 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro - Indisponibilidade dos Circuitos</title>
+    <title>Registro - Coelho Tecnologia</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="shortcut icon" href="favco.png" type="image/x-icon">
 </head>
 <body>
-   <header>
-    <img src="assets/LOGO.png" alt="logo coelho" width="200">
-    <h1>Registro - Indisponibilidade dos Circuitos</h1>
-   </header>
-   <div class="controls">
-    <button id="addRecordBtn">Adicionar Registro</button>
-    <button id="exportCsvBtn">Exportar para CSV</button>
-   </div>
-   <div class="table_container">
-    <table>
-        <thead class="table_content">
-            <tr>
-                <th>Circuito</th>
-                <th>Status</th>
-                <th>Protocolo - Operadora</th>
-                <th>Protocolo - Coelho</th>
-                <th>Data</th>
-                <th>Horário - Início</th>
-                <th>Horário - Fim</th>
-                <th>Tempo total de Indisponibilidade</th>
-            </tr>
-        </thead>
-        <tbody id="registroTableBody">
-            <!-- As linhas da tabela serão inseridas aqui pelo JavaScript -->
-        </tbody>
-    </table>
+    <header>
+        <img src="assets/LOGO.png" alt="logo coelho" width="200">
+        <h1>Registro - Indisponibilidade dos Circuitos</h1>
+    </header>
 
-   </div>
+    <div class="controls">
+        <button id="addRecordBtn">➕ Adicionar Registro</button>
+        <button id="exportCsvBtn" onclick="exportarCSV()">📥 Exportar para CSV</button>
+    </div>
 
-   
+    <div class="filter-bar">
+        <select id="filterCircuito" onchange="renderizarTabela()">
+            <option value="">Filtrar Circuito</option>
+        </select>
+        <select id="filterStatus" onchange="renderizarTabela()">
+            <option value="">Todos os Status</option>
+            <option value="Concluído">Concluído</option>
+            <option value="Em Aberto">Em Aberto</option>
+        </select>
+        <input type="date" id="filterData" onchange="renderizarTabela()">
+        <input type="text" id="filterProtocolo" placeholder="Buscar Protocolo..." onkeyup="renderizarTabela()">
+    </div>
+
+    <div class="table_container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Circuito</th>
+                    <th>Status</th>
+                    <th>Prot. Operadora</th>
+                    <th>Prot. Coelho</th>
+                    <th>Data</th>
+                    <th>Início</th>
+                    <th>Fim</th>
+                    <th>Indisponibilidade</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="registroTableBody"></tbody>
+        </table>
+    </div>
+
+    <div id="modalRegistro" class="modal">
+        <div class="modal-content">
+            <h3>Novo Registro</h3>
+            <form id="formRegistro">
+                <select id="inputCircuito" required></select>
+                <select id="inputStatus" required>
+                    <option value="Em Aberto">Em Aberto</option>
+                    <option value="Concluído">Concluído</option>
+                </select>
+                <input type="text" id="inputProtOperadora" placeholder="Protocolo Operadora">
+                <input type="text" id="inputProtCoelho" placeholder="Protocolo Coelho">
+                <input type="date" id="inputData" required>
+                <div class="time-group">
+                    <label>Início: <input type="time" id="inputInicio" required></label>
+                    <label>Fim: <input type="time" id="inputFim" required></label>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-salvar">Salvar</button>
+                    <button type="button" class="btn-cancelar" id="closeModal">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script/script.js"></script>
 </body>
 </html>
