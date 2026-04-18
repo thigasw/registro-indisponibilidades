@@ -1,0 +1,11 @@
+header{
+    background-color: var(--bg-secondary-color);
+    color: var(--text-secondary-color);
+    padding: 1rem;
+    text-align: center;
+}
+
+header h1{
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
